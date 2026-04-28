@@ -18,6 +18,7 @@ public partial class SettingsView : UserControl
     {
         _loading = true;
         AutoStartCheckBox.IsChecked = StartupService.IsEnabled();
+        DarkModeCheckBox.IsChecked = App.Theme.IsDark;
         _loading = false;
     }
 
@@ -34,5 +35,14 @@ public partial class SettingsView : UserControl
             // Reflect the actual state if the registry write failed.
             Refresh();
         }
+    }
+
+    private void DarkMode_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        var dark = DarkModeCheckBox.IsChecked == true;
+        App.Theme.Apply(dark);
+        App.Settings.DarkMode = dark;
+        try { App.Settings.Save(); } catch { }
     }
 }

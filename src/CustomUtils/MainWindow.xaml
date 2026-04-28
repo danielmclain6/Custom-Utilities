@@ -4,7 +4,7 @@
         Title="Custom Utilities"
         Height="640" Width="980"
         MinHeight="480" MinWidth="780"
-        Background="{StaticResource Bg}"
+        Background="{DynamicResource Bg}"
         WindowStartupLocation="CenterScreen">
 
     <Grid>
@@ -14,12 +14,12 @@
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <Border Grid.Column="0" Background="{StaticResource SidebarBg}">
+        <Border Grid.Column="0" Background="{DynamicResource SidebarBg}">
             <DockPanel LastChildFill="True">
                 <Border DockPanel.Dock="Top" Padding="20,22,20,18">
                     <StackPanel>
                         <TextBlock Text="Custom Utilities"
-                                   Foreground="{StaticResource SidebarFg}"
+                                   Foreground="{DynamicResource SidebarFg}"
                                    FontSize="16" FontWeight="SemiBold"/>
                         <TextBlock Text="Personal toolkit"
                                    Foreground="#FF8B95A1"
@@ -31,7 +31,7 @@
                          DockPanel.Dock="Top"
                          Background="Transparent"
                          BorderThickness="0"
-                         Foreground="{StaticResource SidebarFg}"
+                         Foreground="{DynamicResource SidebarFg}"
                          FontSize="13"
                          SelectionChanged="UtilityList_SelectionChanged">
                     <ListBox.ItemContainerStyle>
@@ -49,7 +49,7 @@
                                                 <Setter TargetName="Bd" Property="Background" Value="#22FFFFFF"/>
                                             </Trigger>
                                             <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrush}"/>
                                                 <Setter Property="Foreground" Value="White"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>

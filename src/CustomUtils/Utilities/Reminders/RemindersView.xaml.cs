@@ -38,14 +38,14 @@ public partial class RemindersView : UserControl
     {
         var card = new Border
         {
-            Background = (Brush)Application.Current.Resources["CardBg"],
             CornerRadius = new CornerRadius(6),
             Padding = new Thickness(16, 12, 16, 12),
             Margin = new Thickness(0, 0, 0, 8),
-            BorderBrush = new SolidColorBrush(Color.FromRgb(0xE5, 0xE7, 0xEB)),
             BorderThickness = new Thickness(1),
             Tag = r.Id,
         };
+        card.SetResourceReference(Border.BackgroundProperty, "CardBg");
+        card.SetResourceReference(Border.BorderBrushProperty, "CardBorder");
 
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -56,22 +56,23 @@ public partial class RemindersView : UserControl
         var sub = new TextBlock
         {
             Text = FormatWhen(r),
-            Foreground = (Brush)Application.Current.Resources["MutedFg"],
             FontSize = 12,
             Margin = new Thickness(0, 3, 0, 0),
         };
+        sub.SetResourceReference(TextBlock.ForegroundProperty, "MutedFg");
         stack.Children.Add(title);
         stack.Children.Add(sub);
         if (!string.IsNullOrWhiteSpace(r.Note))
         {
-            stack.Children.Add(new TextBlock
+            var noteTb = new TextBlock
             {
                 Text = r.Note,
-                Foreground = (Brush)Application.Current.Resources["MutedFg"],
                 FontSize = 12,
                 TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(0, 6, 0, 0),
-            });
+            };
+            noteTb.SetResourceReference(TextBlock.ForegroundProperty, "MutedFg");
+            stack.Children.Add(noteTb);
         }
         Grid.SetColumn(stack, 0);
         grid.Children.Add(stack);

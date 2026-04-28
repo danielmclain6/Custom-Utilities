@@ -1,7 +1,7 @@
 <UserControl x:Class="CustomUtils.Utilities.Reminders.RemindersView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="{StaticResource Bg}">
+             Background="{DynamicResource Bg}">
     <Grid>
         <!-- LIST PANE -->
         <Grid x:Name="ListPane">
@@ -19,7 +19,7 @@
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="Reminders" FontSize="22" FontWeight="SemiBold"/>
                     <TextBlock Text="Schedule a Windows notification for any date and time."
-                               Foreground="{StaticResource MutedFg}" FontSize="12" Margin="0,4,0,0"/>
+                               Foreground="{DynamicResource MutedFg}" FontSize="12" Margin="0,4,0,0"/>
                 </StackPanel>
                 <Button Grid.Column="1"
                         x:Name="NewButton"
@@ -33,16 +33,16 @@
                 <StackPanel>
                     <TextBlock x:Name="EmptyHint"
                                Text="No reminders yet. Click + New reminder to add one."
-                               Foreground="{StaticResource MutedFg}"
+                               Foreground="{DynamicResource MutedFg}"
                                Margin="4,32,0,0"
                                Visibility="Collapsed"/>
 
                     <TextBlock Text="Upcoming" FontSize="13" FontWeight="SemiBold"
-                               Foreground="{StaticResource MutedFg}" Margin="4,0,0,8"/>
+                               Foreground="{DynamicResource MutedFg}" Margin="4,0,0,8"/>
                     <ItemsControl x:Name="UpcomingList"/>
 
                     <TextBlock Text="Past" FontSize="13" FontWeight="SemiBold"
-                               Foreground="{StaticResource MutedFg}" Margin="4,18,0,8"/>
+                               Foreground="{DynamicResource MutedFg}" Margin="4,18,0,8"/>
                     <ItemsControl x:Name="PastList"/>
                 </StackPanel>
             </ScrollViewer>

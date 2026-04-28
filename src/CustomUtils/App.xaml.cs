@@ -26,6 +26,8 @@ public partial class App : Application
     public static ClipboardStore ClipStore { get; private set; } = null!;
     public static ClipboardWatcher ClipWatcher { get; private set; } = null!;
     public static HotkeyService Hotkeys { get; private set; } = null!;
+    public static AppSettings Settings { get; private set; } = null!;
+    public static ThemeService Theme { get; private set; } = null!;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -78,6 +80,10 @@ public partial class App : Application
         _showWatcherThread.Start();
 
         var silent = e.Args.Any(a => string.Equals(a, "--silent", StringComparison.OrdinalIgnoreCase));
+
+        Settings = AppSettings.Load();
+        Theme = new ThemeService();
+        Theme.Apply(Settings.DarkMode);
 
         Store = new ReminderStore();
         Toast = new ToastService();
