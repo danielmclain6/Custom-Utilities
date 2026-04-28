@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows;
 using CustomUtils.Services;
 using CustomUtils.Tray;
+using CustomUtils.Utilities.Clipboard;
 using CustomUtils.Utilities.Reminders;
 
 namespace CustomUtils;
@@ -22,6 +23,9 @@ public partial class App : Application
     public static ReminderScheduler Scheduler { get; private set; } = null!;
     public static ToastService Toast { get; private set; } = null!;
     public static TrayIconService Tray { get; private set; } = null!;
+    public static ClipboardStore ClipStore { get; private set; } = null!;
+    public static ClipboardWatcher ClipWatcher { get; private set; } = null!;
+    public static HotkeyService Hotkeys { get; private set; } = null!;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -91,6 +95,16 @@ public partial class App : Application
         Toast.SnoozeRequested += (id, delay) => Scheduler.Snooze(id, delay);
         Toast.DismissRequested += id => Scheduler.Dismiss(id);
 
+        ClipStore = new ClipboardStore();
+        ClipWatcher = new ClipboardWatcher();
+        ClipWatcher.TextCaptured += text => ClipStore.Capture(text);
+        ClipWatcher.Start();
+
+        Hotkeys = new HotkeyService();
+        Hotkeys.Start();
+        // Alt + Space → show main window. VK_SPACE = 0x20.
+        Hotkeys.Register(HotkeyModifiers.Alt, 0x20, () => Dispatcher.Invoke(ShowMainWindow));
+
         // Default-on auto-start: enable the first time we ever run.
         if (!HasRunBefore())
         {
@@ -142,6 +156,8 @@ public partial class App : Application
     {
         _shuttingDown = true;
         try { Scheduler?.Dispose(); } catch { }
+        try { ClipWatcher?.Dispose(); } catch { }
+        try { Hotkeys?.Dispose(); } catch { }
         try { Tray?.Dispose(); } catch { }
         try { _showEvent?.Set(); _showEvent?.Dispose(); } catch { }
         try { _instanceMutex?.ReleaseMutex(); } catch { }
