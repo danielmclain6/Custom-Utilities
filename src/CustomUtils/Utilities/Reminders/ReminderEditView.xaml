@@ -1,0 +1,93 @@
+<UserControl x:Class="CustomUtils.Utilities.Reminders.ReminderEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource Bg}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="32,28,32,28">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" x:Name="HeaderText" Text="New reminder"
+                       FontSize="22" FontWeight="SemiBold"/>
+
+            <!-- Title -->
+            <StackPanel Grid.Row="1" Margin="0,20,0,0">
+                <TextBlock Text="Title" FontSize="12" Foreground="{StaticResource MutedFg}" Margin="0,0,0,6"/>
+                <TextBox x:Name="TitleBox" Padding="10,8" FontSize="14"/>
+            </StackPanel>
+
+            <!-- Note -->
+            <StackPanel Grid.Row="2" Margin="0,16,0,0">
+                <TextBlock Text="Note (optional)" FontSize="12" Foreground="{StaticResource MutedFg}" Margin="0,0,0,6"/>
+                <TextBox x:Name="NoteBox" Padding="10,8" FontSize="13"
+                         AcceptsReturn="True" TextWrapping="Wrap"
+                         Height="70" VerticalScrollBarVisibility="Auto"/>
+            </StackPanel>
+
+            <!-- Date row -->
+            <StackPanel Grid.Row="3" Margin="0,16,0,0">
+                <TextBlock Text="Date" FontSize="12" Foreground="{StaticResource MutedFg}" Margin="0,0,0,6"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="DateBox"
+                             Grid.Column="0"
+                             Padding="10,8"
+                             FontSize="14"
+                             ToolTip="Format: yyyy-MM-dd"
+                             TextChanged="DateBox_TextChanged"/>
+                    <TextBlock Grid.Column="1" Text="Format: yyyy-MM-dd"
+                               VerticalAlignment="Center" Margin="12,0,0,0"
+                               Foreground="{StaticResource MutedFg}" FontSize="11"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- Calendar -->
+            <Border Grid.Row="4" Margin="0,12,0,0"
+                    Background="{StaticResource CardBg}"
+                    BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="6"
+                    HorizontalAlignment="Left" Padding="6">
+                <Calendar x:Name="DateCalendar" SelectedDatesChanged="DateCalendar_SelectedDatesChanged"/>
+            </Border>
+
+            <!-- Time row -->
+            <StackPanel Grid.Row="5" Margin="0,16,0,0">
+                <TextBlock Text="Time (24-hour HH:mm)" FontSize="12" Foreground="{StaticResource MutedFg}" Margin="0,0,0,6"/>
+                <Grid HorizontalAlignment="Left">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="TimeBox" Grid.Column="0" Padding="10,8" FontSize="14"
+                             ToolTip="Format: HH:mm e.g. 14:30"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0" VerticalAlignment="Center">
+                        <Button Content="-15m" Style="{StaticResource GhostButton}" Click="TimeMinus15_Click" Margin="0,0,4,0"/>
+                        <Button Content="+15m" Style="{StaticResource GhostButton}" Click="TimePlus15_Click" Margin="0,0,4,0"/>
+                        <Button Content="+1h" Style="{StaticResource GhostButton}" Click="TimePlus1h_Click"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- Validation error -->
+            <TextBlock Grid.Row="6" x:Name="ErrorText"
+                       Foreground="#FFD93838" FontSize="12" Margin="0,12,0,0"
+                       Visibility="Collapsed"/>
+
+            <!-- Actions -->
+            <StackPanel Grid.Row="7" Orientation="Horizontal" Margin="0,24,0,0">
+                <Button Content="Save" Style="{StaticResource PrimaryButton}" Click="SaveButton_Click" Margin="0,0,8,0"/>
+                <Button Content="Cancel" Style="{StaticResource GhostButton}" Click="CancelButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
