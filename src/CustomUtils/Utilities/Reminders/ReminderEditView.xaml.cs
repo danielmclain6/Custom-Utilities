@@ -19,21 +19,20 @@ public partial class ReminderEditView : UserControl
         InitializeComponent();
         _editing = existing;
 
+        PopulateStaticDropdowns();
+
         if (existing is null)
         {
             HeaderText.Text = "New reminder";
-            // Default: 1 hour from now, rounded to next 5 minutes.
             var when = RoundToNext5Minutes(DateTime.Now.AddHours(1));
-            SetDate(when.Date);
-            SetTime(when);
+            ApplyDateTime(when);
         }
         else
         {
             HeaderText.Text = "Edit reminder";
             TitleBox.Text = existing.Title;
             NoteBox.Text = existing.Note ?? "";
-            SetDate(existing.FireAt.Date);
-            SetTime(existing.FireAt);
+            ApplyDateTime(existing.FireAt);
         }
 
         Loaded += (_, _) => TitleBox.Focus();
@@ -45,41 +44,141 @@ public partial class ReminderEditView : UserControl
         return new DateTime(t.Year, t.Month, t.Day, t.Hour, 0, 0).AddMinutes(minutes);
     }
 
-    private void SetDate(DateTime d)
+    private void PopulateStaticDropdowns()
     {
         _suppressSync = true;
-        DateBox.Text = d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-        DateCalendar.SelectedDate = d;
-        DateCalendar.DisplayDate = d;
+
+        // Years: this year through +10
+        var thisYear = DateTime.Now.Year;
+        for (int y = thisYear; y <= thisYear + 10; y++)
+            YearCombo.Items.Add(y);
+
+        // Months: 1-12 with names
+        for (int m = 1; m <= 12; m++)
+        {
+            MonthCombo.Items.Add(new ComboBoxItem
+            {
+                Content = $"{m:D2} – {CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)}",
+                Tag = m,
+            });
+        }
+
+        // Hours 0-23
+        for (int h = 0; h < 24; h++)
+            HourCombo.Items.Add(h.ToString("D2"));
+
+        // Minutes 0-59
+        for (int n = 0; n < 60; n++)
+            MinuteCombo.Items.Add(n.ToString("D2"));
+
         _suppressSync = false;
     }
 
-    private void SetTime(DateTime t)
+    private void RebuildDayCombo(int year, int month, int? selectDay)
     {
-        TimeBox.Text = t.ToString("HH:mm", CultureInfo.InvariantCulture);
+        var prev = _suppressSync;
+        _suppressSync = true;
+
+        var days = DateTime.DaysInMonth(year, month);
+        DayCombo.Items.Clear();
+        for (int d = 1; d <= days; d++)
+            DayCombo.Items.Add(d.ToString("D2"));
+
+        var target = selectDay ?? 1;
+        if (target > days) target = days;
+        DayCombo.SelectedIndex = target - 1;
+
+        _suppressSync = prev;
+    }
+
+    private void ApplyDateTime(DateTime dt)
+    {
+        _suppressSync = true;
+
+        // Year
+        var yearIdx = YearCombo.Items.IndexOf(dt.Year);
+        if (yearIdx < 0)
+        {
+            YearCombo.Items.Insert(0, dt.Year);
+            yearIdx = 0;
+        }
+        YearCombo.SelectedIndex = yearIdx;
+
+        // Month
+        MonthCombo.SelectedIndex = dt.Month - 1;
+
+        // Day (depends on year/month)
+        RebuildDayCombo(dt.Year, dt.Month, dt.Day);
+
+        // Time
+        HourCombo.SelectedIndex = dt.Hour;
+        MinuteCombo.SelectedIndex = dt.Minute;
+
+        // Calendar
+        DateCalendar.SelectedDate = dt.Date;
+        DateCalendar.DisplayDate = dt.Date;
+
+        _suppressSync = false;
+    }
+
+    private DateTime? ReadFromDropdowns()
+    {
+        if (YearCombo.SelectedItem is not int year) return null;
+        if (MonthCombo.SelectedItem is not ComboBoxItem mItem || mItem.Tag is not int month) return null;
+        if (DayCombo.SelectedItem is not string dayStr || !int.TryParse(dayStr, out var day)) return null;
+        if (HourCombo.SelectedItem is not string hourStr || !int.TryParse(hourStr, out var hour)) return null;
+        if (MinuteCombo.SelectedItem is not string minStr || !int.TryParse(minStr, out var minute)) return null;
+
+        try { return new DateTime(year, month, day, hour, minute, 0); }
+        catch { return null; }
+    }
+
+    private void DatePart_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressSync) return;
+        if (YearCombo.SelectedItem is not int year) return;
+        if (MonthCombo.SelectedItem is not ComboBoxItem mItem || mItem.Tag is not int month) return;
+
+        // If year/month changed, rebuild Day list (days-in-month varies).
+        if (sender == YearCombo || sender == MonthCombo)
+        {
+            int? keep = null;
+            if (DayCombo.SelectedItem is string ds && int.TryParse(ds, out var d)) keep = d;
+            RebuildDayCombo(year, month, keep);
+        }
+
+        var dt = ReadFromDropdowns();
+        if (dt is null) return;
+
+        _suppressSync = true;
+        DateCalendar.SelectedDate = dt.Value.Date;
+        DateCalendar.DisplayDate = dt.Value.Date;
+        _suppressSync = false;
+    }
+
+    private void TimePart_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        // Time dropdowns don't affect the calendar, so nothing to sync.
     }
 
     private void DateCalendar_SelectedDatesChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (_suppressSync) return;
-        if (DateCalendar.SelectedDate is { } d)
-        {
-            _suppressSync = true;
-            DateBox.Text = d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-            _suppressSync = false;
-        }
-    }
+        if (DateCalendar.SelectedDate is not { } d) return;
 
-    private void DateBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (_suppressSync) return;
-        if (DateTime.TryParseExact(DateBox.Text, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d))
+        _suppressSync = true;
+
+        var yearIdx = YearCombo.Items.IndexOf(d.Year);
+        if (yearIdx < 0)
         {
-            _suppressSync = true;
-            DateCalendar.SelectedDate = d;
-            DateCalendar.DisplayDate = d;
-            _suppressSync = false;
+            YearCombo.Items.Insert(0, d.Year);
+            yearIdx = 0;
         }
+        YearCombo.SelectedIndex = yearIdx;
+        MonthCombo.SelectedIndex = d.Month - 1;
+        RebuildDayCombo(d.Year, d.Month, d.Day);
+
+        _suppressSync = false;
     }
 
     private bool TryParseInputs(out DateTime fireAt, out string error)
@@ -93,20 +192,14 @@ public partial class ReminderEditView : UserControl
             return false;
         }
 
-        if (!DateTime.TryParseExact(DateBox.Text, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d))
+        var dt = ReadFromDropdowns();
+        if (dt is null)
         {
-            error = "Date must be in yyyy-MM-dd format.";
+            error = "Please pick a valid date and time.";
             return false;
         }
 
-        if (!TimeSpan.TryParseExact(TimeBox.Text, @"h\:mm", CultureInfo.InvariantCulture, out var t)
-            && !TimeSpan.TryParseExact(TimeBox.Text, @"hh\:mm", CultureInfo.InvariantCulture, out t))
-        {
-            error = "Time must be in HH:mm format (e.g. 14:30).";
-            return false;
-        }
-
-        fireAt = d.Add(t);
+        fireAt = dt.Value;
         if (fireAt <= DateTime.Now)
         {
             error = "Reminder must be in the future.";
@@ -138,20 +231,4 @@ public partial class ReminderEditView : UserControl
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e) => Done?.Invoke(null);
-
-    private void TimePlus15_Click(object sender, RoutedEventArgs e) => BumpTime(TimeSpan.FromMinutes(15));
-    private void TimeMinus15_Click(object sender, RoutedEventArgs e) => BumpTime(TimeSpan.FromMinutes(-15));
-    private void TimePlus1h_Click(object sender, RoutedEventArgs e) => BumpTime(TimeSpan.FromHours(1));
-
-    private void BumpTime(TimeSpan delta)
-    {
-        if (!TimeSpan.TryParseExact(TimeBox.Text, @"h\:mm", CultureInfo.InvariantCulture, out var t)
-            && !TimeSpan.TryParseExact(TimeBox.Text, @"hh\:mm", CultureInfo.InvariantCulture, out t))
-        {
-            t = DateTime.Now.TimeOfDay;
-        }
-        var combined = (DateCalendar.SelectedDate ?? DateTime.Today).Date.Add(t).Add(delta);
-        SetDate(combined.Date);
-        SetTime(combined);
-    }
 }

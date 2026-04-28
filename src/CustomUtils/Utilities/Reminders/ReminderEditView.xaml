@@ -32,27 +32,29 @@
                          Height="70" VerticalScrollBarVisibility="Auto"/>
             </StackPanel>
 
-            <!-- Date row -->
+            <!-- Date dropdowns -->
             <StackPanel Grid.Row="3" Margin="0,16,0,0">
                 <TextBlock Text="Date" FontSize="12" Foreground="{StaticResource MutedFg}" Margin="0,0,0,6"/>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="DateBox"
-                             Grid.Column="0"
-                             Padding="10,8"
-                             FontSize="14"
-                             ToolTip="Format: yyyy-MM-dd"
-                             TextChanged="DateBox_TextChanged"/>
-                    <TextBlock Grid.Column="1" Text="Format: yyyy-MM-dd"
-                               VerticalAlignment="Center" Margin="12,0,0,0"
-                               Foreground="{StaticResource MutedFg}" FontSize="11"/>
-                </Grid>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="Year" FontSize="11" Foreground="{StaticResource MutedFg}" Margin="0,0,0,2"/>
+                        <ComboBox x:Name="YearCombo" Width="90" Padding="8,6" FontSize="14"
+                                  SelectionChanged="DatePart_Changed"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="Month" FontSize="11" Foreground="{StaticResource MutedFg}" Margin="0,0,0,2"/>
+                        <ComboBox x:Name="MonthCombo" Width="130" Padding="8,6" FontSize="14"
+                                  SelectionChanged="DatePart_Changed"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Day" FontSize="11" Foreground="{StaticResource MutedFg}" Margin="0,0,0,2"/>
+                        <ComboBox x:Name="DayCombo" Width="70" Padding="8,6" FontSize="14"
+                                  SelectionChanged="DatePart_Changed"/>
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
 
-            <!-- Calendar -->
+            <!-- Calendar (still available) -->
             <Border Grid.Row="4" Margin="0,12,0,0"
                     Background="{StaticResource CardBg}"
                     BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="6"
@@ -60,22 +62,21 @@
                 <Calendar x:Name="DateCalendar" SelectedDatesChanged="DateCalendar_SelectedDatesChanged"/>
             </Border>
 
-            <!-- Time row -->
+            <!-- Time dropdowns -->
             <StackPanel Grid.Row="5" Margin="0,16,0,0">
-                <TextBlock Text="Time (24-hour HH:mm)" FontSize="12" Foreground="{StaticResource MutedFg}" Margin="0,0,0,6"/>
-                <Grid HorizontalAlignment="Left">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="TimeBox" Grid.Column="0" Padding="10,8" FontSize="14"
-                             ToolTip="Format: HH:mm e.g. 14:30"/>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0" VerticalAlignment="Center">
-                        <Button Content="-15m" Style="{StaticResource GhostButton}" Click="TimeMinus15_Click" Margin="0,0,4,0"/>
-                        <Button Content="+15m" Style="{StaticResource GhostButton}" Click="TimePlus15_Click" Margin="0,0,4,0"/>
-                        <Button Content="+1h" Style="{StaticResource GhostButton}" Click="TimePlus1h_Click"/>
+                <TextBlock Text="Time (24-hour)" FontSize="12" Foreground="{StaticResource MutedFg}" Margin="0,0,0,6"/>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="Hour" FontSize="11" Foreground="{StaticResource MutedFg}" Margin="0,0,0,2"/>
+                        <ComboBox x:Name="HourCombo" Width="80" Padding="8,6" FontSize="14"
+                                  SelectionChanged="TimePart_Changed"/>
                     </StackPanel>
-                </Grid>
+                    <StackPanel>
+                        <TextBlock Text="Minute" FontSize="11" Foreground="{StaticResource MutedFg}" Margin="0,0,0,2"/>
+                        <ComboBox x:Name="MinuteCombo" Width="80" Padding="8,6" FontSize="14"
+                                  SelectionChanged="TimePart_Changed"/>
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
 
             <!-- Validation error -->

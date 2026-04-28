@@ -59,6 +59,7 @@
                         </Style>
                     </ListBox.ItemContainerStyle>
                     <ListBoxItem Tag="reminders" IsSelected="True">Reminders</ListBoxItem>
+                    <ListBoxItem Tag="clipboard">Clipboard</ListBoxItem>
                     <ListBoxItem Tag="settings">Settings</ListBoxItem>
                 </ListBox>
             </DockPanel>

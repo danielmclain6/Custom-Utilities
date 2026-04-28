@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using CustomUtils.Utilities.Clipboard;
 using CustomUtils.Utilities.Reminders;
 
 namespace CustomUtils;
@@ -9,6 +10,7 @@ namespace CustomUtils;
 public partial class MainWindow : Window
 {
     private RemindersView? _remindersView;
+    private ClipboardHistoryView? _clipboardView;
     private SettingsView? _settingsView;
 
     public MainWindow()
@@ -33,8 +35,15 @@ public partial class MainWindow : Window
         switch (item.Tag as string)
         {
             case "reminders": ShowReminders(); break;
+            case "clipboard": ShowClipboard(); break;
             case "settings": ShowSettings(); break;
         }
+    }
+
+    private void ShowClipboard()
+    {
+        _clipboardView ??= new ClipboardHistoryView();
+        ContentHost.Content = _clipboardView;
     }
 
     private void ShowReminders()
